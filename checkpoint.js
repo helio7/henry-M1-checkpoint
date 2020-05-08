@@ -43,13 +43,14 @@ const {
 // allí la recursión
 
 var objContains = function(obj, prop, value){
-	for (let clave in obj) {
-		if (typeof clave === "object"){
-			return objContains(clave, prop, value);
+	for (var clave in obj) {
+		if (typeof obj[clave] === "object"){
+			return objContains(obj[clave], prop, value);
 		}
-		if (clave === prop && obj[clave] === value) {
+		else if(clave === prop && obj[clave] === value) {
 			return true;
 		}
+		else{}
 	}
 	return false;
 }
@@ -388,8 +389,58 @@ function closureSum(numFijo) {
 //    const anagrams = allAnagrams('abc');
 //    console.log(anagrams); // [ 'abc', 'acb', 'bac', 'bca', 'cab', 'cba' ]
 
-var allAnagrams = function(string, array, index) {
- 
+function nFactorial(n) {
+		if ( n === 0 || n === 1 ) return 1;
+		else if ( n > 0 && n % Math.round(n) === 0 ) return n * nFactorial(n - 1);
+		else return 0;
+	}
+
+var allAnagrams = function(string){ // Intento fallido de hacerlo para cualquier cantidad de caracteres. Desastre.
+	
+	var caracteres = [];
+	for(let i = 0; i<string.length; i++){
+		caracteres[i] = string[i];
+	}
+	var cantidadDeCaracteres = caracteres.length;
+	
+	var cantidadDeAnagramas = nFactorial(cantidadDeCaracteres);
+	var anagramas = [];
+	for(let i = 0; i<cantidadDeAnagramas; i++){
+		anagramas.push("");
+	}
+	
+	var primeros = 0;
+	for(let i = 0; i<cantidadDeCaracteres; i++){
+		
+		for(let j = primeros; j < primeros + 2; j++){
+			anagramas[j] = anagramas[j] + caracteres[i];
+		}
+		primeros = primeros + cantidadDeAnagramas/cantidadDeCaracteres;
+	}
+	
+	var repetido = false;
+	var repetidos = [];
+	for(let k = 0; k < anagramas.length; k++){
+		
+		for(let l = 0; l < caracteres.length; l++){
+			
+			repetido = false;
+			
+			for(let o = 0; o < anagramas[k].length; o++){
+				if(anagramas[k][o] === caracteres[l]){
+					repetido = true;
+				}
+			}
+			
+			if(!repetido){
+				anagramas[k] = anagramas[k] + caracteres[l];
+				repetidos.push(caracteres[l]);
+			}
+		}
+	}
+	
+	console.log(caracteres);
+	console.log(anagramas);
 };
 
 module.exports = {
