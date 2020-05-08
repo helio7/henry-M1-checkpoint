@@ -43,7 +43,15 @@ const {
 // allí la recursión
 
 var objContains = function(obj, prop, value){
- 
+	for (let clave in obj) {
+		if (typeof clave === "object"){
+			return objContains(clave, prop, value);
+		}
+		if (clave === prop && obj[clave] === value) {
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -58,7 +66,21 @@ var objContains = function(obj, prop, value){
 // [Para más información del método: https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/isArray]
 
 var countArray = function(array){
-  
+	var suma = 0;
+	
+	if (!array.length) {
+		return 0;
+	}
+	
+  for (let i = 0; i < array.length; i++){
+		if(!Array.isArray(array[i])){
+			suma = suma + array[i];
+		}
+		else {
+			suma = suma + countArray(array[i]);
+		}
+	}
+	return suma;
 }
 
 // ---------------------
@@ -78,7 +100,18 @@ var countArray = function(array){
 //    lista.size(); --> 3
 
 LinkedList.prototype.size = function(){
- 
+	if (this.head === null) {
+		return 0;
+	}
+	else {
+		var array_size = 1;
+		var puntero = this.head;
+    while (puntero.next !== null) {
+			array_size++;
+      puntero = puntero.next;
+    }
+		return array_size;
+	}
 }
 
 
@@ -99,7 +132,39 @@ LinkedList.prototype.size = function(){
 //    sin antes tener cargada la posición 0 y 1.
 
 LinkedList.prototype.addInPos = function(pos, value){
-  
+	var array_size = this.size();
+  if (pos > array_size){
+		return false;
+	}
+	else {
+		
+		if (pos === array_size){
+			this.add(value);
+			return true;
+		}
+		
+		if (pos < array_size){
+			this.add("x");
+			var puntero = this.head;
+			
+			var i = pos;
+			while (i !== 0) {
+				puntero = puntero.next;
+				i--;
+			}
+			
+			var valorEnCache = "x";
+			
+			while(puntero.next !== null){
+				valorEnCache = puntero.value;
+				puntero.value = value;
+				puntero = puntero.next;
+				puntero.value = valorEnCache;
+			}
+			
+			return true;
+		}
+	}
 }
 
 // EJERCICIO 5
@@ -110,7 +175,29 @@ LinkedList.prototype.addInPos = function(pos, value){
 //    Lista nueva luego de aplicar el reverse: Head --> 13 --> 10 --> 4 --> 1 --> null
 
 LinkedList.prototype.reverse = function(){
- 
+	var puntero = this.head;
+	var listaDeValores = [];
+	while (puntero.next !== null) {
+		listaDeValores.push(puntero.value);
+    puntero = puntero.next;
+  }
+	listaDeValores.push(puntero.value);
+	
+	//puntero = this.head;
+	//var i = listaDeValores.length - 1;
+	//while (puntero.next !== null) {
+	//	puntero.value = listaDeValores[i];
+	//	puntero = puntero.next;
+	//	i--;
+	//}
+	//puntero.value = listaDeValores[i];
+	
+	var listaInvertida = new LinkedList();
+	for (let i = 0; i < listaDeValores.length; i++){
+		listaInvertida.add(listaDeValores[listaDeValores.length - 1 - i]);
+	}
+	
+	return listaInvertida;
 }
 
 
@@ -141,7 +228,32 @@ LinkedList.prototype.reverse = function(){
 //    - mazoUserB = [6,9,10,3,6,4]
 
 var cardGame = function(mazoUserA, mazoUserB){
+	var cartaA = 0;
+	var cartaB = 0;
+	while((mazoUserA.size() !== 0) && (mazoUserB.size() !== 0)){
+		cartaA = mazoUserA.dequeue();
+		cartaB = mazoUserB.dequeue();
+		
+		if (cartaA > cartaB){
+			mazoUserA.enqueue(cartaA);
+			mazoUserA.enqueue(cartaB);
+		}
+		else if (cartaA < cartaB){
+			mazoUserB.enqueue(cartaB);
+			mazoUserB.enqueue(cartaA);
+		}
+		else{}
+	}
 
+	if((mazoUserA.size() === 0) && (mazoUserB.size() === 0)){
+		return "Game tie!";
+	}
+	else if(mazoUserA.size() === 0){
+		return "B wins!";
+	}
+	else{
+		return "A wins!";
+	}
 }
 
 // ---------------
@@ -164,7 +276,13 @@ var cardGame = function(mazoUserA, mazoUserB){
 //       5
 
 var generateBST = function(array){
- 
+	var tree = new BinarySearchTree(array[0]);
+	
+	for(let i = 1; i < array.length; i++){
+		tree.insert(array[i]);
+	}
+	
+	return tree;
 }
 
 
@@ -185,8 +303,27 @@ var generateBST = function(array){
 
 
 var binarySearch = function (array, target) {
-
-  
+	var min = 0;
+	var max = array.length - 1;
+	var average = 0;
+	
+	var nBusquedas = 0
+	while(nBusquedas !== 5){
+		average = Math.floor((max - min)/2);
+		index = min + average;
+		if(array[index] === target){
+			return average;
+		}
+		else if(array[index] < target){
+			min = index + 1;
+		}
+		else {
+			max = index - 1;
+		}
+		nBusquedas++;
+	}
+	return -1;
+	
 }
 
 // EJERCICIO 9
@@ -199,7 +336,22 @@ var binarySearch = function (array, target) {
 
 
 var selectionSort = function(array) {
-  
+	var indice;
+	
+	acc = 0;
+	while(acc < array.length - 1){
+		indice = acc;
+		for(var i = 1 + acc; i<array.length; i++){
+			if(array[indice] > array[i]){
+				indice = i;
+			}
+		}
+		var cache = array[acc];
+		array[acc] = array[indice];
+		array[indice] = cache;
+		acc++;
+	}
+	return array;
 }
 
 // ----- Closures -----
@@ -218,6 +370,10 @@ var selectionSort = function(array) {
 
 function closureSum(numFijo) {
  
+	return function funcion(a){
+		return a + numFijo;
+	};
+	
 }
 
 // -------------------
